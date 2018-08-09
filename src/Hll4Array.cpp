@@ -75,6 +75,10 @@ AuxHashMap* Hll4Array::getAuxHashMap() {
   return auxHashMap;
 }
 
+void Hll4Array::putAuxHashMap(AuxHashMap* auxHashMap) {
+  this->auxHashMap = auxHashMap;
+}
+
 int Hll4Array::getSlot(const int slotNo) {
   int theByte = hllByteArr[slotNo >> 1];
   if ((slotNo & 1) > 0) { // odd?
@@ -241,6 +245,7 @@ void Hll4Array::shiftToBiggerCurMin() {
         newAuxMap->mustAdd(slotNum, oldActualVal);
       }
     } //end scan of oldAuxMap
+    delete itr;
   } //end if (auxHashMap != null)
   else { // oldAuxMap == null
     assert(numAuxTokens == 0);

@@ -13,8 +13,6 @@
 #include "HllArray.hpp"
 #include "HllSketch.hpp"
 
-using std::endl;
-
 namespace sketches {
 
 HllSketch::HllSketch(const int lgConfigK, const TgtHllType tgtHllType) {
@@ -31,6 +29,14 @@ HllSketch::HllSketch(const HllSketch& that) {
 
 HllSketch::HllSketch(HllSketchImpl* that) {
   hllSketchImpl = that;
+}
+
+HllSketch* HllSketch::copy() {
+  return new HllSketch(*this);
+}
+
+HllSketch* HllSketch::copyAs(const TgtHllType tgtHllType) {
+  return new HllSketch(hllSketchImpl->copyAs(tgtHllType));
 }
 
 void HllSketch::reset() {
@@ -57,39 +63,41 @@ std::ostream& operator<<(std::ostream& os, HllSketch& sketch) {
   return sketch.to_string(os, true, true, false, false);
 }
 
-std::ostream& HllSketch::to_string(std::ostream& os, const bool summary, const bool detail, const bool auxDetail, const bool all) {
+std::ostream& HllSketch::to_string(std::ostream& os, const bool summary,
+                                   const bool detail, const bool auxDetail, const bool all) {
   if (summary) {
-    os << "### HLL SKETCH SUMMARY: " << endl
-       << "  Log Config K   : " << getLgConfigK() << endl
-       << "  Hll Target     : " << type_as_string() << endl
-       << "  Current Mode   : " << mode_as_string() << endl
-       << "  LB             : " << getLowerBound(1) << endl
-       << "  Estimate       : " << getEstimate() << endl
-       << "  UB             : " << getUpperBound(1) << endl
-       << "  OutOfOrder flag: " << isOutOfOrderFlag() << endl;
+    os << "### HLL SKETCH SUMMARY: " << std::endl
+       << "  Log Config K   : " << getLgConfigK() << std::endl
+       << "  Hll Target     : " << type_as_string() << std::endl
+       << "  Current Mode   : " << mode_as_string() << std::endl
+       << "  LB             : " << getLowerBound(1) << std::endl
+       << "  Estimate       : " << getEstimate() << std::endl
+       << "  UB             : " << getUpperBound(1) << std::endl
+       << "  OutOfOrder flag: " << isOutOfOrderFlag() << std::endl;
     if (getCurrentMode() == HLL) {
       HllArray* hllArray = (HllArray*) hllSketchImpl;
-      os << "  CurMin       : " << hllArray->getCurMin() << endl
-         << "  NumAtCurMin  : " << hllArray->getNumAtCurMin() << endl
-         << "  HipAccum     : " << hllArray->getHipAccum() << endl
-         << "  KxQ0         : " << hllArray->getKxQ0() << endl
-         << "  KxQ1         : " << hllArray->getKxQ1() << endl;
+      os << "  CurMin       : " << hllArray->getCurMin() << std::endl
+         << "  NumAtCurMin  : " << hllArray->getNumAtCurMin() << std::endl
+         << "  HipAccum     : " << hllArray->getHipAccum() << std::endl
+         << "  KxQ0         : " << hllArray->getKxQ0() << std::endl
+         << "  KxQ1         : " << hllArray->getKxQ1() << std::endl;
     } else {
-      os << "  Coupon count : " << std::to_string(((AbstractCoupons*) hllSketchImpl)->getCouponCount()) << endl;
+      os << "  Coupon count : "
+         << std::to_string(((AbstractCoupons*) hllSketchImpl)->getCouponCount()) << std::endl;
     }
   }
 
   if (detail) {
-    os << "### HLL SKETCH DATA DETAIL: " << endl;
+    os << "### HLL SKETCH DATA DETAIL: " << std::endl;
     PairIterator* pitr = getIterator();
-    os << pitr->getHeader() << endl;
+    os << pitr->getHeader() << std::endl;
     if (all) {
       while (pitr->nextAll()) {
-        os << pitr->getString() << endl;
+        os << pitr->getString() << std::endl;
       }
     } else {
       while (pitr->nextValid()) {
-        os << pitr->getString() << endl;
+        os << pitr->getString() << std::endl;
       }
     }
     delete pitr;
@@ -111,6 +119,7 @@ std::ostream& HllSketch::to_string(std::ostream& os, const bool summary, const b
           }
         }
       }
+      delete auxItr;
     }
   }
 

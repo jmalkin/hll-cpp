@@ -21,8 +21,8 @@ class HllSketch : public BaseHllSketch {
     explicit HllSketch(const int lgConfigK, const TgtHllType tgtHllType);
     ~HllSketch();
 
-    HllSketch copy();
-    HllSketch copyAs(const TgtHllType tgtHllType);
+    HllSketch* copy();
+    HllSketch* copyAs(const TgtHllType tgtHllType);
 
     void reset();
 

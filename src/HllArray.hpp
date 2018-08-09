@@ -6,6 +6,7 @@
 #pragma once
 
 #include "HllSketchImpl.hpp"
+#include "AuxHashMap.hpp"
 
 namespace sketches {
 
@@ -43,6 +44,7 @@ class HllArray : public HllSketchImpl {
     virtual int getHllByteArrBytes() = 0;
 
     virtual PairIterator* getIterator() = 0;
+
     virtual PairIterator* getAuxIterator();
 
     virtual int getUpdatableSerializationBytes();
@@ -78,6 +80,7 @@ class HllArray : public HllSketchImpl {
     static void hipAndKxQIncrementalUpdate(HllArray& host, const int oldValue, const int newValue);
     double getHllBitMapEstimate(const int lgConfigK, const int curMin, const int numAtCurMin);
     double getHllRawEstimate(const int lgConfigK, const double kxqSum);
+    virtual AuxHashMap* getAuxHashMap();
 
     double hipAccum;
     double kxq0;
@@ -86,6 +89,8 @@ class HllArray : public HllSketchImpl {
     int curMin; //always zero for Hll6 and Hll8, only used / tracked by Hll4Array
     int numAtCurMin; //interpreted as num zeros when curMin == 0
     bool oooFlag; //Out-Of-Order Flag
+
+    friend class Conversions;
 };
 
 

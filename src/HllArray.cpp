@@ -3,9 +3,7 @@
  * Apache License 2.0. See LICENSE file at the project root for terms.
  */
 
-#include <cstring>
-#include <cmath>
-
+#include "HllArray.hpp"
 #include "HarmonicNumbers.hpp"
 #include "CubicInterpolation.hpp"
 #include "CompositeInterpolationXTable.hpp"
@@ -13,7 +11,10 @@
 #include "CouponList.hpp"
 #include "Hll8Array.hpp"
 #include "Hll4Array.hpp"
-#include "HllArray.hpp"
+#include "Conversions.hpp"
+
+#include <cstring>
+#include <cmath>
 
 namespace sketches {
 
@@ -44,7 +45,7 @@ HllArray::HllArray(HllArray& that)
 }
 
 HllArray::~HllArray() {
-  delete [] hllByteArr;
+  delete hllByteArr;
 }
 
 HllArray* HllArray::copyAs(const TgtHllType tgtHllType) {
@@ -52,9 +53,9 @@ HllArray* HllArray::copyAs(const TgtHllType tgtHllType) {
     return (HllArray*) copy();
   }
   if (tgtHllType == HLL_4) {
-    throw std::invalid_argument("HLL_4 not yet supported");
+    return Conversions::convertToHll4(*this);
   } else { // tgtHllType == HLL_8
-    throw std::invalid_argument("Already HLL_8, nothing to convert");
+    return Conversions::convertToHll8(*this);
   }
 }
 
@@ -311,6 +312,10 @@ int HllArray::getPreInts() {
 }
 
 PairIterator* HllArray::getAuxIterator() {
+  return NULL;
+}
+
+AuxHashMap* HllArray::getAuxHashMap() {
   return NULL;
 }
 

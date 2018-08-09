@@ -12,7 +12,7 @@
 using namespace sketches;
 
 int main() {
-  HllSketch* sketch = new HllSketch(4, sketches::TgtHllType::HLL_4);
+  HllSketch* sketch = new HllSketch(4, sketches::TgtHllType::HLL_8);
 
   sketch->update("value1");
   sketch->update((uint64_t) 2);
@@ -22,10 +22,10 @@ int main() {
     sketch->update((uint64_t) i);
   }
 
-  //cout << sketch;
-  std::ostringstream oss;
-  sketch->to_string(oss, true, true, false, true);
-  std::cout << oss.str();
+  sketch->to_string(std::cout, true, true, false, true);
+
+  HllSketch* newSketch = sketch->copyAs(TgtHllType::HLL_4);
+  newSketch->to_string(std::cout, true, true, false, true);
 
   std::cout << "Done" << std::endl;
 

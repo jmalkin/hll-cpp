@@ -30,8 +30,11 @@ class Hll4Array : public HllArray {
 
     virtual HllSketchImpl* couponUpdate(const int coupon);
 
-  protected:
     virtual AuxHashMap* getAuxHashMap();
+    // does *not* delete old map if overwriting
+    void putAuxHashMap(AuxHashMap* auxHashMap);
+
+  protected:
     void internalHll4Update(const int slotNo, const int newVal);
     void shiftToBiggerCurMin();
 

@@ -149,6 +149,7 @@ HllSketchImpl* CouponList::promoteHeapListOrSetToHll(CouponList& src) {
     tgtHllArr->putHipAccum(src.getEstimate());
   }
   tgtHllArr->putOutOfOrderFlag(false);
+  delete srcItr;
   return tgtHllArr;
 }
 
