@@ -19,7 +19,7 @@ class Hll8Array : public HllArray {
 
     virtual Hll8Array* copy();
 
-    virtual PairIterator* getIterator();
+    virtual std::unique_ptr<PairIterator> getIterator();
 
     virtual int getSlot(const int slotNo);
     virtual void putSlot(const int slotNo, const int value);

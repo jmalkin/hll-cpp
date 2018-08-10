@@ -9,8 +9,6 @@
 #include <cmath>
 #include <cassert>
 
-using std::string;
-
 namespace sketches {
 
 int BaseHllSketch::getSerializationVersion() {
@@ -61,7 +59,7 @@ int BaseHllSketch::getNumberOfLeadingZeros(const uint64_t x) {
   return n;
 }
 
-void BaseHllSketch::update(const string datum) {
+void BaseHllSketch::update(const std::string datum) {
   if (datum.empty()) { return; }
   uint64_t hashResult[2];
   hash(datum.c_str(), datum.length(), DEFAULT_UPDATE_SEED, hashResult);
@@ -79,7 +77,7 @@ void BaseHllSketch::update(const double datum) {
 }
 
 void BaseHllSketch::update(const void* data, const size_t len) {
-  if (data == NULL) { return; }
+  if (data == nullptr) { return; }
   uint64_t hashResult[2];
   hash(data, len, DEFAULT_UPDATE_SEED, hashResult);
   couponUpdate(coupon(hashResult));

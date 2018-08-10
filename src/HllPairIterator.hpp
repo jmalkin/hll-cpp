@@ -9,9 +9,9 @@
 #include "HllArray.hpp"
 
 namespace sketches {
+  
 class HllPairIterator : public PairIterator {
   public:
-    //HllPairIterator(const HllArray& hllArray, const int lengthPairs);
     HllPairIterator(const int lengthPairs);
     virtual std::string getHeader();
     virtual int getIndex();

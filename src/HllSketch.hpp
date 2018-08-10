@@ -5,11 +5,12 @@
 
 #pragma once
 
-#include <iostream>
-
 #include "BaseHllSketch.hpp"
 #include "PairIterator.hpp"
 #include "HllSketchImpl.hpp"
+
+#include <memory>
+#include <iostream>
 
 namespace sketches {
 
@@ -47,7 +48,7 @@ class HllSketch : public BaseHllSketch {
   protected:
     HllSketchImpl* hllSketchImpl;
 
-    virtual PairIterator* getIterator();
+    virtual std::unique_ptr<PairIterator> getIterator();
 
     CurMode getCurrentMode();
 

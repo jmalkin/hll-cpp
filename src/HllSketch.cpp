@@ -3,15 +3,15 @@
  * Apache License 2.0. See LICENSE file at the project root for terms.
  */
 
+#include "HllSketch.hpp"
+#include "HllUtil.hpp"
+#include "CouponList.hpp"
+#include "HllArray.hpp"
+
 #include <cstdio>
 #include <cstdlib>
 #include <string>
 #include <iostream>
-
-#include "HllUtil.hpp"
-#include "CouponList.hpp"
-#include "HllArray.hpp"
-#include "HllSketch.hpp"
 
 namespace sketches {
 
@@ -89,7 +89,7 @@ std::ostream& HllSketch::to_string(std::ostream& os, const bool summary,
 
   if (detail) {
     os << "### HLL SKETCH DATA DETAIL: " << std::endl;
-    PairIterator* pitr = getIterator();
+    std::unique_ptr<PairIterator> pitr = getIterator();
     os << pitr->getHeader() << std::endl;
     if (all) {
       while (pitr->nextAll()) {
@@ -100,13 +100,12 @@ std::ostream& HllSketch::to_string(std::ostream& os, const bool summary,
         os << pitr->getString() << std::endl;
       }
     }
-    delete pitr;
   }
   if (auxDetail) {
     if ((getCurrentMode() == HLL) && (getTgtHllType() == HLL_4)) {
       HllArray* hllArray = (HllArray*) hllSketchImpl;
-      PairIterator* auxItr = hllArray->getAuxIterator();
-      if (auxItr != NULL) {
+      std::unique_ptr<PairIterator> auxItr = hllArray->getAuxIterator();
+      if (auxItr != nullptr) {
         os << "### HLL SKETCH AUX DETAIL: " << std::endl
            << auxItr->getHeader() << std::endl;
         if (all) {
@@ -119,7 +118,6 @@ std::ostream& HllSketch::to_string(std::ostream& os, const bool summary,
           }
         }
       }
-      delete auxItr;
     }
   }
 
@@ -174,8 +172,8 @@ bool HllSketch::isEmpty() {
   return hllSketchImpl->isEmpty();
 }
 
-PairIterator* HllSketch::getIterator() {
-  return hllSketchImpl->getIterator();
+std::unique_ptr<PairIterator> HllSketch::getIterator() {
+  return std::move(hllSketchImpl->getIterator());
 }
 
 std::string HllSketch::type_as_string() {

@@ -3,9 +3,10 @@
  * Apache License 2.0. See LICENSE file at the project root for terms.
  */
 
-#include <cstring>
-
 #include "Hll4Array.hpp"
+
+#include <cstring>
+#include <memory>
 
 namespace sketches {
 
@@ -31,7 +32,7 @@ Hll4Array::Hll4Array(const int lgConfigK) :
   const int numBytes = hll4ArrBytes(lgConfigK);
   hllByteArr = new uint8_t[numBytes];
   std::fill(hllByteArr, hllByteArr + numBytes, 0);
-  auxHashMap = NULL;
+  auxHashMap = nullptr;
 }
 
 Hll4Array::Hll4Array(Hll4Array& that) :
@@ -40,31 +41,34 @@ Hll4Array::Hll4Array(Hll4Array& that) :
   const int numBytes = hll4ArrBytes(lgConfigK);
   hllByteArr = new uint8_t[numBytes];
   std::copy(that.hllByteArr, that.hllByteArr + numBytes, hllByteArr);
-  if (that.auxHashMap != NULL) {
+  if (that.auxHashMap != nullptr) {
     auxHashMap = that.auxHashMap->copy();
   } else {
-    auxHashMap = NULL;
+    auxHashMap = nullptr;
   }
 }
 
 Hll4Array::~Hll4Array() {
   // hllByteArr deleted in parent
-  delete auxHashMap;
+  if (auxHashMap != nullptr) {
+    delete auxHashMap;
+  }
 }
 
 Hll4Array* Hll4Array::copy() {
   return new Hll4Array(*this);
 }
 
-PairIterator* Hll4Array::getIterator() {
-  return new Hll4Iterator(*this, 1 << lgConfigK);
+std::unique_ptr<PairIterator> Hll4Array::getIterator() {
+  PairIterator* itr = new Hll4Iterator(*this, 1 << lgConfigK);
+  return std::move(std::unique_ptr<PairIterator>(itr));
 }
 
-PairIterator* Hll4Array::getAuxIterator() {
-  if (auxHashMap != NULL) {
-    return auxHashMap->getIterator();
+std::unique_ptr<PairIterator> Hll4Array::getAuxIterator() {
+  if (auxHashMap != nullptr) {
+    return std::move(auxHashMap->getIterator());
   }
-  return NULL;
+  return nullptr;
 }
 
 int Hll4Array::getHllByteArrBytes() {
@@ -155,7 +159,7 @@ void Hll4Array::internalHll4Update(const int slotNo, const int newVal) {
           // The AUX_TOKEN must be stored in the 4-bit array and the new value
           // added to the exception table
           putSlot(slotNo, AUX_TOKEN);
-          if (auxHashMap == NULL) {
+          if (auxHashMap == nullptr) {
             auxHashMap = new AuxHashMap(LG_AUX_ARR_INTS[lgConfigK], lgConfigK);
           }
           auxHashMap->mustAdd(slotNo, newVal);
@@ -209,19 +213,19 @@ void Hll4Array::shiftToBiggerCurMin() {
       if (oldStoredValue == 0) { numAtNewCurMin++; }
     } else { //oldStoredValue == AUX_TOKEN
       numAuxTokens++;
-      assert(auxHashMap != NULL); // auxHashMap cannot be null at this point
+      assert(auxHashMap != nullptr); // auxHashMap cannot be null at this point
     }
   }
 
   // If old AuxHashMap exists, walk through it updating some slots and build a new AuxHashMap
   // if needed.
-  AuxHashMap* newAuxMap = NULL;
-  if (auxHashMap != NULL) {
+  AuxHashMap* newAuxMap = nullptr;
+  if (auxHashMap != nullptr) {
     int slotNum;
     int oldActualVal;
     int newShiftedVal;
 
-    PairIterator* itr = auxHashMap->getIterator();
+    std::unique_ptr<PairIterator> itr = auxHashMap->getIterator();
     while (itr->nextValid()) {
       slotNum = itr->getKey() & configKmask;
       oldActualVal = itr->getValue();
@@ -239,19 +243,18 @@ void Hll4Array::shiftToBiggerCurMin() {
       }
       else { //newShiftedVal >= AUX_TOKEN
         // the former exception remains an exception, so must be added to the newAuxMap
-        if (newAuxMap == NULL) {
+        if (newAuxMap == nullptr) {
           newAuxMap = new AuxHashMap(LG_AUX_ARR_INTS[lgConfigK], lgConfigK);
         }
         newAuxMap->mustAdd(slotNum, oldActualVal);
       }
     } //end scan of oldAuxMap
-    delete itr;
   } //end if (auxHashMap != null)
   else { // oldAuxMap == null
     assert(numAuxTokens == 0);
   }
 
-  if (newAuxMap != NULL) {
+  if (newAuxMap != nullptr) {
     if (newAuxMap->getAuxCount() != numAuxTokens) {
       std::ostringstream oss;
       oss << "auxCount: " << newAuxMap->getAuxCount()
@@ -260,7 +263,7 @@ void Hll4Array::shiftToBiggerCurMin() {
     }
   }
 
-  if (auxHashMap != NULL) {
+  if (auxHashMap != nullptr) {
     delete auxHashMap;
   }
   auxHashMap = newAuxMap;

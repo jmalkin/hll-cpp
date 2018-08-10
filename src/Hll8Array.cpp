@@ -17,8 +17,7 @@ Hll8Iterator::Hll8Iterator(Hll8Array& hllArray, const int lengthPairs)
 Hll8Iterator::~Hll8Iterator() { }
 
 int Hll8Iterator::value() {
-  // we know it must be an Hll8Array so the cast is safe
-  return ((Hll8Array) hllArray).hllByteArr[index] & VAL_MASK_6;
+  return hllArray.hllByteArr[index] & VAL_MASK_6;
 }
 
 Hll8Array::Hll8Array(const int lgConfigK) :
@@ -44,8 +43,9 @@ Hll8Array* Hll8Array::copy() {
   return new Hll8Array(*this);
 }
 
-PairIterator* Hll8Array::getIterator() {
-  return new Hll8Iterator(*this, 1 << lgConfigK);
+std::unique_ptr<PairIterator> Hll8Array::getIterator() {
+  PairIterator* itr = new Hll8Iterator(*this, 1 << lgConfigK);
+  return std::move(std::unique_ptr<PairIterator>(itr));
 }
 
 int Hll8Array::getSlot(const int slotNo) {

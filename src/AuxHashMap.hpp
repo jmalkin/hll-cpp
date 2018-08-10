@@ -7,6 +7,8 @@
 
 #include "IntArrayPairIterator.hpp"
 
+#include <memory>
+
 namespace sketches {
 
 class AuxHashMap {
@@ -22,7 +24,7 @@ class AuxHashMap {
     int getAuxCount();
     int* getAuxIntArr();
     int getLgAuxArrInts();
-    PairIterator* getIterator();
+    std::unique_ptr<PairIterator> getIterator();
 
     void mustAdd(const int slotNo, const int value);
     int mustFindValueFor(const int slotNo);

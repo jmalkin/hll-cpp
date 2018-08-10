@@ -6,6 +6,8 @@
 #include "Conversions.hpp"
 #include "HllArray.hpp"
 
+#include <memory>
+
 namespace sketches {
 
 Hll4Array* Conversions::convertToHll4(HllArray& srcHllArr) {
@@ -20,7 +22,7 @@ Hll4Array* Conversions::convertToHll4(HllArray& srcHllArr) {
 
   // 2nd pass: must know curMin.
   // Populate KxQ registers, build AuxHashMap if needed
-  PairIterator* itr = srcHllArr.getIterator();
+  std::unique_ptr<PairIterator> itr = srcHllArr.getIterator();
   // nothing allocated, may be null
   AuxHashMap* auxHashMap = srcHllArr.getAuxHashMap();
 
@@ -30,7 +32,7 @@ Hll4Array* Conversions::convertToHll4(HllArray& srcHllArr) {
     HllArray::hipAndKxQIncrementalUpdate(*hll4Array, 0, actualValue);
     if (actualValue >= (curMin + 15)) {
       hll4Array->putSlot(slotNo, AUX_TOKEN);
-      if (auxHashMap == NULL) {
+      if (auxHashMap == nullptr) {
         auxHashMap = new AuxHashMap(LG_AUX_ARR_INTS[lgConfigK], lgConfigK);
         hll4Array->putAuxHashMap(auxHashMap);
       }
@@ -39,8 +41,6 @@ Hll4Array* Conversions::convertToHll4(HllArray& srcHllArr) {
       hll4Array->putSlot(slotNo, actualValue - curMin);
     }
   }
-  
-  delete itr;
 
   hll4Array->putCurMin(curMin);
   hll4Array->putNumAtCurMin(numAtCurMin);
@@ -52,7 +52,7 @@ Hll4Array* Conversions::convertToHll4(HllArray& srcHllArr) {
 int Conversions::curMinAndNum(HllArray& hllArr) {
   int curMin = 64;
   int numAtCurMin = 0;
-  PairIterator* itr = hllArr.getIterator();
+  std::unique_ptr<PairIterator> itr = hllArr.getIterator();
   while (itr->nextAll()) {
     int v = itr->getValue();
     if (v < curMin) {
@@ -62,7 +62,6 @@ int Conversions::curMinAndNum(HllArray& hllArr) {
       ++numAtCurMin;
     }
   }
-  delete itr;
 
   return pair(numAtCurMin, curMin);
 }
@@ -73,14 +72,13 @@ Hll8Array* Conversions::convertToHll8(HllArray& srcHllArr) {
   hll8Array->putOutOfOrderFlag(srcHllArr.isOutOfOrderFlag());
 
   int numZeros = 1 << lgConfigK;
-  PairIterator* itr = srcHllArr.getIterator();
+  std::unique_ptr<PairIterator> itr = srcHllArr.getIterator();
   while (itr->nextAll()) {
     if (itr->getValue() != EMPTY) {
       --numZeros;
       hll8Array->couponUpdate(itr->getPair());
     }
   }
-  delete itr;
 
   hll8Array->putNumAtCurMin(numZeros);
   hll8Array->putHipAccum(srcHllArr.getHipAccum());

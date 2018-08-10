@@ -30,6 +30,7 @@ int main() {
   std::cout << "Done" << std::endl;
 
   delete sketch;
+  delete newSketch;
 
   return 0;
 }

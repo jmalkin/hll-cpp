@@ -3,11 +3,12 @@
  * Apache License 2.0. See LICENSE file at the project root for terms.
  */
 
-#include <cstring>
-#include <sstream>
-
 #include "HllUtil.hpp"
 #include "AuxHashMap.hpp"
+
+#include <cstring>
+#include <sstream>
+#include <memory>
 
 namespace sketches {
 
@@ -54,8 +55,9 @@ int AuxHashMap::getUpdatableSizeBytes() {
   return 4 << lgAuxArrInts;
 }
 
-PairIterator* AuxHashMap::getIterator() {
-  return new IntArrayPairIterator(auxIntArr, 1 << lgAuxArrInts, lgConfigK);
+std::unique_ptr<PairIterator> AuxHashMap::getIterator() {
+  PairIterator* itr = new IntArrayPairIterator(auxIntArr, 1 << lgAuxArrInts, lgConfigK);
+  return std::move(std::unique_ptr<PairIterator>(itr));
 }
 
 void AuxHashMap::mustAdd(const int slotNo, const int value) {

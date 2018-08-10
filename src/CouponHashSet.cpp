@@ -3,9 +3,9 @@
  * Apache License 2.0. See LICENSE file at the project root for terms.
  */
 
-#include <cassert>
-
 #include "CouponHashSet.hpp"
+
+#include <cassert>
 
 namespace sketches {
 

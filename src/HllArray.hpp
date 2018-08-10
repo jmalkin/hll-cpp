@@ -43,9 +43,9 @@ class HllArray : public HllSketchImpl {
 
     virtual int getHllByteArrBytes() = 0;
 
-    virtual PairIterator* getIterator() = 0;
+    virtual std::unique_ptr<PairIterator> getIterator() = 0;
 
-    virtual PairIterator* getAuxIterator();
+    virtual std::unique_ptr<PairIterator> getAuxIterator();
 
     virtual int getUpdatableSerializationBytes();
     virtual int getCompactSerializationBytes();

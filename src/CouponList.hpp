@@ -29,7 +29,7 @@ class CouponList : public AbstractCoupons {
   protected:
     virtual int getCouponCount();
     virtual int getCompactSerializationBytes();
-    virtual PairIterator* getIterator();
+    virtual std::unique_ptr<PairIterator> getIterator();
     virtual int getMemDataStart();
     virtual int getPreInts();
     virtual bool isCompact();

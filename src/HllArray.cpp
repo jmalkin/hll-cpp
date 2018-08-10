@@ -26,7 +26,7 @@ HllArray::HllArray(const int lgConfigK, const TgtHllType tgtHllType)
   curMin = 0;
   numAtCurMin = 1 << lgConfigK;
   oooFlag = false;
-  hllByteArr = NULL; // allocated in derived class
+  hllByteArr = nullptr; // allocated in derived class
 }
 
 HllArray::HllArray(HllArray& that)
@@ -311,12 +311,12 @@ int HllArray::getPreInts() {
   return HLL_PREINTS;
 }
 
-PairIterator* HllArray::getAuxIterator() {
-  return NULL;
+std::unique_ptr<PairIterator> HllArray::getAuxIterator() {
+  return nullptr;
 }
 
 AuxHashMap* HllArray::getAuxHashMap() {
-  return NULL;
+  return nullptr;
 }
 
 void HllArray::hipAndKxQIncrementalUpdate(HllArray& host, const int oldValue, const int newValue) {

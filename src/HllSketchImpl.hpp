@@ -7,6 +7,8 @@
 
 #include "HllSketch.hpp"
 
+#include <memory>
+
 namespace sketches {
 
 class HllSketch;
@@ -29,7 +31,7 @@ class HllSketchImpl {
     virtual double getUpperBound(int numStdDev) = 0;
     virtual double getLowerBound(int numStdDev) = 0;
 
-    virtual PairIterator* getIterator() = 0;
+    virtual std::unique_ptr<PairIterator> getIterator() = 0;
 
     int getLgConfigK();
 

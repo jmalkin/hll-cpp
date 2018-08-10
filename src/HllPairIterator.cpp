@@ -11,10 +11,8 @@
 
 namespace sketches {
 
-//HllPairIterator::HllPairIterator(const HllArray& hllArray, const int lengthPairs)
 HllPairIterator::HllPairIterator(const int lengthPairs)
-  : //hllArray(hllArray),
-    lengthPairs(lengthPairs),
+  : lengthPairs(lengthPairs),
     index(-1),
     val(-1)
 { }

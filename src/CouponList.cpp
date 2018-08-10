@@ -3,15 +3,15 @@
  * Apache License 2.0. See LICENSE file at the project root for terms.
  */
 
-#include <iostream>
-#include <cstring>
-#include <algorithm>
-
+#include "CouponList.hpp"
+#include "CouponHashSet.hpp"
 #include "HllUtil.hpp"
 #include "IntArrayPairIterator.hpp"
 #include "HllArray.hpp"
-#include "CouponHashSet.hpp"
-#include "CouponList.hpp"
+
+#include <iostream>
+#include <cstring>
+#include <algorithm>
 
 namespace sketches {
 
@@ -124,8 +124,9 @@ int* CouponList::getCouponIntArr() {
   return couponIntArr;
 }
 
-PairIterator* CouponList::getIterator() {
-  return new IntArrayPairIterator(couponIntArr, 1 << lgCouponArrInts, lgConfigK);
+std::unique_ptr<PairIterator> CouponList::getIterator() {
+  PairIterator* itr = new IntArrayPairIterator(couponIntArr, 1 << lgCouponArrInts, lgConfigK);
+  return std::move(std::unique_ptr<PairIterator>(itr));
 }
 
 HllSketchImpl* CouponList::promoteHeapListToSet(CouponList& list) {
@@ -142,14 +143,13 @@ HllSketchImpl* CouponList::promoteHeapListToSet(CouponList& list) {
 
 HllSketchImpl* CouponList::promoteHeapListOrSetToHll(CouponList& src) {
   HllArray* tgtHllArr = HllArray::newHll(src.lgConfigK, src.tgtHllType);
-  PairIterator* srcItr = src.getIterator();
+  std::unique_ptr<PairIterator> srcItr = src.getIterator();
   tgtHllArr->putKxQ0(1 << src.lgConfigK);
   while (srcItr->nextValid()) {
     tgtHllArr->couponUpdate(srcItr->getPair());
     tgtHllArr->putHipAccum(src.getEstimate());
   }
   tgtHllArr->putOutOfOrderFlag(false);
-  delete srcItr;
   return tgtHllArr;
 }
 
