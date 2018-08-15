@@ -45,12 +45,24 @@ class HllSketch : public BaseHllSketch {
     int getUpdatableSerializationBytes();
     int getCompactSerializationBytes();
 
+    /**
+     * Returns the maximum size in bytes that this sketch can grow to given lgConfigK.
+    * However, for the HLL_4 sketch type, this value can be exceeded in extremely rare cases.
+    * If exceeded, it will be larger by only a few percent.
+    *
+    * @param lgConfigK The Log2 of K for the target HLL sketch. This value must be
+    * between 4 and 21 inclusively.
+    * @param tgtHllType the desired Hll type
+    * @return the maximum size in bytes that this sketch can grow to.
+    */
+    static int getMaxUpdatableSerializationBytes(const int lgK, TgtHllType tgtHllType);
+
   protected:
     HllSketchImpl* hllSketchImpl;
 
     virtual std::unique_ptr<PairIterator> getIterator();
 
-    CurMode getCurrentMode();
+    CurMode getCurMode();
 
     // copy constructors
     HllSketch(const HllSketch& that);
@@ -60,6 +72,8 @@ class HllSketch : public BaseHllSketch {
 
     std::string type_as_string();
     std::string mode_as_string();
+
+    friend class Union;
 };
 
 std::ostream& operator<<(std::ostream& os, HllSketch& sketch);

@@ -74,7 +74,7 @@ std::ostream& HllSketch::to_string(std::ostream& os, const bool summary,
        << "  Estimate       : " << getEstimate() << std::endl
        << "  UB             : " << getUpperBound(1) << std::endl
        << "  OutOfOrder flag: " << isOutOfOrderFlag() << std::endl;
-    if (getCurrentMode() == HLL) {
+    if (getCurMode() == HLL) {
       HllArray* hllArray = (HllArray*) hllSketchImpl;
       os << "  CurMin       : " << hllArray->getCurMin() << std::endl
          << "  NumAtCurMin  : " << hllArray->getNumAtCurMin() << std::endl
@@ -102,7 +102,7 @@ std::ostream& HllSketch::to_string(std::ostream& os, const bool summary,
     }
   }
   if (auxDetail) {
-    if ((getCurrentMode() == HLL) && (getTgtHllType() == HLL_4)) {
+    if ((getCurMode() == HLL) && (getTgtHllType() == HLL_4)) {
       HllArray* hllArray = (HllArray*) hllSketchImpl;
       std::unique_ptr<PairIterator> auxItr = hllArray->getAuxIterator();
       if (auxItr != nullptr) {
@@ -140,8 +140,8 @@ double HllSketch::getUpperBound(int numStdDev) {
   return hllSketchImpl->getUpperBound(numStdDev);
 }
 
-CurMode HllSketch::getCurrentMode() {
-  return hllSketchImpl->getCurrentMode();
+CurMode HllSketch::getCurMode() {
+  return hllSketchImpl->getCurMode();
 }
 
 int HllSketch::getLgConfigK() {
@@ -188,7 +188,7 @@ std::string HllSketch::type_as_string() {
 }
 
 std::string HllSketch::mode_as_string() {
-  switch (hllSketchImpl->getCurrentMode()) {
+  switch (hllSketchImpl->getCurMode()) {
     case LIST:
       return std::string("LIST");
     case SET:
@@ -199,5 +199,18 @@ std::string HllSketch::mode_as_string() {
       throw std::runtime_error("Sketch state error: Invalid CurMode");
   }
 }
+
+int HllSketch::getMaxUpdatableSerializationBytes(const int lgConfigK,
+    const TgtHllType tgtHllType) {
+  int arrBytes;
+  if (tgtHllType == TgtHllType::HLL_4) {
+    const int auxBytes = 4 << LG_AUX_ARR_INTS[lgConfigK];
+    arrBytes =  HllArray::hll4ArrBytes(lgConfigK) + auxBytes;
+  } else { //HLL_8
+    arrBytes = HllArray::hll8ArrBytes(lgConfigK);
+  }
+  return HLL_BYTE_ARR_START + arrBytes;
+}
+
 
 }

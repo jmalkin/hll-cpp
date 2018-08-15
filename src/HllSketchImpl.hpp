@@ -24,7 +24,7 @@ class HllSketchImpl {
 
     virtual HllSketchImpl* couponUpdate(int coupon) = 0;
 
-    CurMode getCurrentMode();
+    CurMode getCurMode();
 
     virtual double getEstimate() = 0;
     virtual double getCompositeEstimate() = 0;

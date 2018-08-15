@@ -5,6 +5,7 @@
 
 #include "BaseHllSketch.hpp"
 #include "MurmurHash3.h"
+#include "RelativeErrorTables.hpp"
 
 #include <cmath>
 #include <cassert>
@@ -86,5 +87,11 @@ void BaseHllSketch::update(const void* data, const size_t len) {
 void BaseHllSketch::hash(const void* key, const int keyLen, const uint64_t seed, uint64_t* result) {
   MurmurHash3_x64_128(key, keyLen, DEFAULT_UPDATE_SEED, result);
 }
+
+double BaseHllSketch::getRelErr(const bool upperBound, const bool unioned,
+                                const int lgConfigK, const int numStdDev) {
+  return RelativeErrorTables::getRelErr(upperBound, unioned, lgConfigK, numStdDev);
+}
+
 
 }

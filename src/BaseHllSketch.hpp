@@ -46,6 +46,9 @@ class BaseHllSketch {
 
     virtual void reset() = 0;
 
+    double getRelErr(const bool upperBound, const bool unioned,
+                     const int lgConfigK, const int numStdDev);
+
     //virtual char* toCompactByteArray();
 
     //virtual char* toUpdatableByteArray();
@@ -70,7 +73,7 @@ class BaseHllSketch {
 
     virtual void couponUpdate(int coupon) = 0;
 
-    virtual enum CurMode getCurrentMode() = 0;
+    virtual enum CurMode getCurMode() = 0;
 
     static const uint64_t DEFAULT_UPDATE_SEED = 9001L;
     static const int KEY_BITS_26 = 26;
