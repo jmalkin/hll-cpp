@@ -168,6 +168,7 @@ void Union::unionImpl(HllSketchImpl* incomingImpl, const int lgMaxK) {
       }
       //whichever is True wins:
       dstImpl->putOutOfOrderFlag(dstImpl->isOutOfOrderFlag() | srcImpl->isOutOfOrderFlag());
+      // gadget: cleanly updated as needed
       break;
     }
     case 1: { //src: SET, gadget: LIST
@@ -177,7 +178,8 @@ void Union::unionImpl(HllSketchImpl* incomingImpl, const int lgMaxK) {
         dstImpl = leakFreeCouponUpdate(dstImpl, srcItr->getPair()); //assignment required
       }
       dstImpl->putOutOfOrderFlag(true); //SET oooFlag is always true
-       break;
+      // gadget: cleanly updated as needed
+      break;
     }
     case 2: { //src: HLL, gadget: LIST
       //swap so that src is gadget-LIST, tgt is HLL
@@ -190,6 +192,8 @@ void Union::unionImpl(HllSketchImpl* incomingImpl, const int lgMaxK) {
       }
       //whichever is True wins:
       dstImpl->putOutOfOrderFlag(srcImpl->isOutOfOrderFlag() | dstImpl->isOutOfOrderFlag());
+      // gadget: swapped, replacing with new impl
+      delete gadget->hllSketchImpl;
       break;
     }
     case 4: { //src: LIST, gadget: SET
@@ -198,6 +202,7 @@ void Union::unionImpl(HllSketchImpl* incomingImpl, const int lgMaxK) {
         dstImpl = leakFreeCouponUpdate(dstImpl, srcItr->getPair()); //assignment required
       }
       dstImpl->putOutOfOrderFlag(true); //SET oooFlag is always true
+      // gadget: cleanly updated as needed
       break;
     }
     case 5: { //src: SET, gadget: SET
@@ -206,6 +211,7 @@ void Union::unionImpl(HllSketchImpl* incomingImpl, const int lgMaxK) {
         dstImpl = leakFreeCouponUpdate(dstImpl, srcItr->getPair()); //assignment required
       }
       dstImpl->putOutOfOrderFlag(true); //SET oooFlag is always true
+      // gadget: cleanly updated as needed
       break;
     }
     case 6: { //src: HLL, gadget: SET
@@ -219,6 +225,8 @@ void Union::unionImpl(HllSketchImpl* incomingImpl, const int lgMaxK) {
         dstImpl = leakFreeCouponUpdate(dstImpl, srcItr->getPair()); //assignment required
       }
       dstImpl->putOutOfOrderFlag(true); //merging SET into non-empty HLL -> true
+      // gadget: swapped, replacing with new impl
+      delete gadget->hllSketchImpl;
       break;
     }
     case 8: { //src: LIST, gadget: HLL
@@ -229,6 +237,8 @@ void Union::unionImpl(HllSketchImpl* incomingImpl, const int lgMaxK) {
       }
       //whichever is True wins:
       dstImpl->putOutOfOrderFlag(dstImpl->isOutOfOrderFlag() | srcImpl->isOutOfOrderFlag());
+      // gadget: should remain unchanged
+      assert(dstImpl == gadget->hllSketchImpl); // should not have changed from HLL
       break;
     }
     case 9: { //src: SET, gadget: HLL
@@ -238,6 +248,8 @@ void Union::unionImpl(HllSketchImpl* incomingImpl, const int lgMaxK) {
         dstImpl = leakFreeCouponUpdate(dstImpl, srcItr->getPair()); //assignment required
       }
       dstImpl->putOutOfOrderFlag(true); //merging SET into existing HLL -> true
+      // gadget: should remain unchanged
+      assert(dstImpl == gadget->hllSketchImpl); // should not have changed from HLL
       break;
     }
     case 10: { //src: HLL, gadget: HLL
@@ -245,13 +257,16 @@ void Union::unionImpl(HllSketchImpl* incomingImpl, const int lgMaxK) {
       const int dstLgK = dstImpl->getLgConfigK();
       const int minLgK = ((srcLgK < dstLgK) ? srcLgK : dstLgK);
       if ((srcLgK < dstLgK) || (dstImpl->getTgtHllType() != HLL_8)) {
-        dstImpl = copyOrDownsampleHll(dstImpl, minLgK); //TODO Fix for off-heap
+        dstImpl = copyOrDownsampleHll(dstImpl, minLgK);
+        // always replaces gadget
+        delete gadget->hllSketchImpl;
       }
       std::unique_ptr<PairIterator> srcItr = srcImpl->getIterator(); //HLL
       while (srcItr->nextValid()) {
         dstImpl = leakFreeCouponUpdate(dstImpl, srcItr->getPair()); //assignment required
       }
       dstImpl->putOutOfOrderFlag(true); //union of two HLL modes is always true
+      // gadget: replaced if copied/downampled, otherwise should be unchanged
       break;
     }
     case 12: { //src: LIST, gadget: empty
@@ -260,6 +275,7 @@ void Union::unionImpl(HllSketchImpl* incomingImpl, const int lgMaxK) {
         dstImpl = leakFreeCouponUpdate(dstImpl, srcItr->getPair()); //assignment required
       }
       dstImpl->putOutOfOrderFlag(srcImpl->isOutOfOrderFlag()); //whatever source is
+      // gadget: cleanly updated as needed
       break;
     }
     case 13: { //src: SET, gadget: empty
@@ -268,20 +284,19 @@ void Union::unionImpl(HllSketchImpl* incomingImpl, const int lgMaxK) {
         dstImpl = leakFreeCouponUpdate(dstImpl, srcItr->getPair()); //assignment required
       }
       dstImpl->putOutOfOrderFlag(true); //SET oooFlag is always true
+      // gadget: cleanly updated as needed
       break;
     }
     case 14: { //src: HLL, gadget: empty
       dstImpl = copyOrDownsampleHll(srcImpl, lgMaxK);
       dstImpl->putOutOfOrderFlag(srcImpl->isOutOfOrderFlag()); //whatever source is.
+      // gadget: always replaced with copied/downsampled sketch
+      delete gadget->hllSketchImpl;
       break;
     }
   }
-  // replace annd free gadget, if necessary
-  //return dstImpl;
-  if (dstImpl != gadget->hllSketchImpl) {
-    delete gadget->hllSketchImpl;
-    gadget->hllSketchImpl = dstImpl;
-  }
+  
+  gadget->hllSketchImpl = dstImpl;
 }
 
 
