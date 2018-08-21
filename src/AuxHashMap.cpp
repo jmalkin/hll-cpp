@@ -57,7 +57,7 @@ int AuxHashMap::getUpdatableSizeBytes() {
 
 std::unique_ptr<PairIterator> AuxHashMap::getIterator() {
   PairIterator* itr = new IntArrayPairIterator(auxIntArr, 1 << lgAuxArrInts, lgConfigK);
-  return std::move(std::unique_ptr<PairIterator>(itr));
+  return std::unique_ptr<PairIterator>(itr);
 }
 
 void AuxHashMap::mustAdd(const int slotNo, const int value) {

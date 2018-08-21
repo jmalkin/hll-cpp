@@ -173,7 +173,7 @@ bool HllSketch::isEmpty() {
 }
 
 std::unique_ptr<PairIterator> HllSketch::getIterator() {
-  return std::move(hllSketchImpl->getIterator());
+  return hllSketchImpl->getIterator();
 }
 
 std::string HllSketch::type_as_string() {

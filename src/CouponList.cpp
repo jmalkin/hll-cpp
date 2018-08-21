@@ -126,7 +126,7 @@ int* CouponList::getCouponIntArr() {
 
 std::unique_ptr<PairIterator> CouponList::getIterator() {
   PairIterator* itr = new IntArrayPairIterator(couponIntArr, 1 << lgCouponArrInts, lgConfigK);
-  return std::move(std::unique_ptr<PairIterator>(itr));
+  return std::unique_ptr<PairIterator>(itr);
 }
 
 HllSketchImpl* CouponList::promoteHeapListToSet(CouponList& list) {

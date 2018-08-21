@@ -9,7 +9,7 @@
 #include "HllSketch.hpp"
 #include "Union.hpp"
 
-int main() {
+//int main() {
 /*
   sketches::HllSketch* sketch = new sketches::HllSketch(4, sketches::TgtHllType::HLL_4);
 
@@ -31,6 +31,7 @@ int main() {
   delete sketch;
   delete newSketch;
 */
+/*
   sketches::HllSketch* s1 = new sketches::HllSketch(8, sketches::TgtHllType::HLL_8);
   sketches::HllSketch* s2 = new sketches::HllSketch(8, sketches::TgtHllType::HLL_8);
 
@@ -52,3 +53,4 @@ int main() {
 
   return 0;
 }
+*/

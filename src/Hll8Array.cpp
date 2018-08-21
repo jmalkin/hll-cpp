@@ -30,9 +30,7 @@ Hll8Array::Hll8Array(const int lgConfigK) :
 Hll8Array::Hll8Array(Hll8Array& that) :
   HllArray(that)
 {
-  const int numBytes = hll8ArrBytes(lgConfigK);
-  hllByteArr = new uint8_t[numBytes];
-  std::copy(that.hllByteArr, that.hllByteArr + numBytes, hllByteArr);
+  // can determine hllByteArr size in parent class, no need to allocate here
 }
 
 Hll8Array::~Hll8Array() {
@@ -45,7 +43,7 @@ Hll8Array* Hll8Array::copy() {
 
 std::unique_ptr<PairIterator> Hll8Array::getIterator() {
   PairIterator* itr = new Hll8Iterator(*this, 1 << lgConfigK);
-  return std::move(std::unique_ptr<PairIterator>(itr));
+  return std::unique_ptr<PairIterator>(itr);
 }
 
 int Hll8Array::getSlot(const int slotNo) {

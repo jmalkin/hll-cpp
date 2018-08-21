@@ -38,9 +38,8 @@ Hll4Array::Hll4Array(const int lgConfigK) :
 Hll4Array::Hll4Array(Hll4Array& that) :
   HllArray(that)
 {
-  const int numBytes = hll4ArrBytes(lgConfigK);
-  hllByteArr = new uint8_t[numBytes];
-  std::copy(that.hllByteArr, that.hllByteArr + numBytes, hllByteArr);
+  // can determine hllByteArr size in parent class, no need to allocate here
+  // but parent class doesn't handle the auxHashMap
   if (that.auxHashMap != nullptr) {
     auxHashMap = that.auxHashMap->copy();
   } else {
@@ -61,12 +60,12 @@ Hll4Array* Hll4Array::copy() {
 
 std::unique_ptr<PairIterator> Hll4Array::getIterator() {
   PairIterator* itr = new Hll4Iterator(*this, 1 << lgConfigK);
-  return std::move(std::unique_ptr<PairIterator>(itr));
+  return std::unique_ptr<PairIterator>(itr);
 }
 
 std::unique_ptr<PairIterator> Hll4Array::getAuxIterator() {
   if (auxHashMap != nullptr) {
-    return std::move(auxHashMap->getIterator());
+    return auxHashMap->getIterator();
   }
   return nullptr;
 }
