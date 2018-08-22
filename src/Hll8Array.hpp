@@ -8,7 +8,7 @@
 #include "HllArray.hpp"
 #include "HllPairIterator.hpp"
 
-namespace sketches {
+namespace datasketches {
 
 class Hll8Array : public HllArray {
   public:

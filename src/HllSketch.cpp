@@ -13,10 +13,10 @@
 #include <string>
 #include <iostream>
 
-namespace sketches {
+namespace datasketches {
 
 HllSketch::HllSketch(const int lgConfigK, const TgtHllType tgtHllType) {
-  hllSketchImpl = new CouponList(sketches::checkLgK(lgConfigK), tgtHllType, LIST);
+  hllSketchImpl = new CouponList(HllUtil::checkLgK(lgConfigK), tgtHllType, LIST);
 }
 
 HllSketch::~HllSketch() {
@@ -44,7 +44,7 @@ void HllSketch::reset() {
 }
 
 void HllSketch::couponUpdate(int coupon) {
-  if (coupon == sketches::EMPTY) { return; }
+  if (coupon == HllUtil::EMPTY) { return; }
   HllSketchImpl* result = this->hllSketchImpl->couponUpdate(coupon);
   if (result != this->hllSketchImpl) {
     delete this->hllSketchImpl;
@@ -204,12 +204,12 @@ int HllSketch::getMaxUpdatableSerializationBytes(const int lgConfigK,
     const TgtHllType tgtHllType) {
   int arrBytes;
   if (tgtHllType == TgtHllType::HLL_4) {
-    const int auxBytes = 4 << LG_AUX_ARR_INTS[lgConfigK];
+    const int auxBytes = 4 << HllUtil::LG_AUX_ARR_INTS[lgConfigK];
     arrBytes =  HllArray::hll4ArrBytes(lgConfigK) + auxBytes;
   } else { //HLL_8
     arrBytes = HllArray::hll8ArrBytes(lgConfigK);
   }
-  return HLL_BYTE_ARR_START + arrBytes;
+  return HllUtil::HLL_BYTE_ARR_START + arrBytes;
 }
 
 

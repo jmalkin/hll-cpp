@@ -13,15 +13,15 @@
 #include <cstring>
 #include <algorithm>
 
-namespace sketches {
+namespace datasketches {
 
 CouponList::CouponList(const int lgConfigK, const TgtHllType tgtHllType, const CurMode curMode)
   : AbstractCoupons(lgConfigK, tgtHllType, curMode) {
-    if (curMode == LIST) {
-      lgCouponArrInts = sketches::LG_INIT_LIST_SIZE;
+    if (curMode == CurMode::LIST) {
+      lgCouponArrInts = HllUtil::LG_INIT_LIST_SIZE;
       oooFlag = false;
     } else { // curMode == SET
-      lgCouponArrInts = sketches::LG_INIT_SET_SIZE;
+      lgCouponArrInts = HllUtil::LG_INIT_SET_SIZE;
       oooFlag = true;
     }
     const int arrayLen = 1 << lgCouponArrInts;
@@ -68,7 +68,7 @@ HllSketchImpl* CouponList::couponUpdate(int coupon) {
   const int len = 1 << lgCouponArrInts;
   for (int i = 0; i < len; ++i) { // search for empty slot
     const int couponAtIdx = couponIntArr[i];
-    if (couponAtIdx == sketches::EMPTY) {
+    if (couponAtIdx == HllUtil::EMPTY) {
       couponIntArr[i] = coupon; // the actual update
       ++couponCount;
       if (couponCount >= len) { // array full
@@ -97,11 +97,11 @@ int CouponList::getCompactSerializationBytes() {
 }
 
 int CouponList::getMemDataStart() {
-  return sketches::LIST_INT_ARR_START;
+  return HllUtil::LIST_INT_ARR_START;
 }
 
 int CouponList::getPreInts() {
-  return sketches::LIST_PREINTS;
+  return HllUtil::LIST_PREINTS;
 }
 
 bool CouponList::isCompact() { return false; }
@@ -113,7 +113,7 @@ void CouponList::putOutOfOrderFlag(bool oooFlag) {
 }
 
 CouponList* CouponList::reset() {
-  return new CouponList(lgConfigK, tgtHllType, LIST);
+  return new CouponList(lgConfigK, tgtHllType, CurMode::LIST);
 }
 
 int CouponList::getLgCouponArrInts() {
@@ -153,7 +153,4 @@ HllSketchImpl* CouponList::promoteHeapListOrSetToHll(CouponList& src) {
   return tgtHllArr;
 }
 
-
 }
-
-

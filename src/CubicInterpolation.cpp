@@ -7,7 +7,7 @@
 
 #include "CubicInterpolation.hpp"
 
-namespace sketches {
+namespace datasketches {
 
 static double interpolateUsingXAndYTables(double xArr[], double yArr[], int offset, double x);
 static double cubicInterpolate(double x0, double y0, double x1, double y1,

@@ -7,7 +7,7 @@
 
 #include "AbstractCoupons.hpp"
 
-namespace sketches {
+namespace datasketches {
 
 class CouponList : public AbstractCoupons {
   public:

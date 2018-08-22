@@ -7,7 +7,7 @@
 
 #include "HllSketchImpl.hpp"
 
-namespace sketches {
+namespace datasketches {
 
 class AbstractCoupons : public HllSketchImpl {
   public:

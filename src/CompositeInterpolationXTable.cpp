@@ -8,7 +8,7 @@
 #include "HllUtil.hpp"
 #include "CompositeInterpolationXTable.hpp"
 
-namespace sketches {
+namespace datasketches {
 
 static const int numXArrValues = 257;
 
@@ -19,8 +19,8 @@ static const int yStrides[] =
   {1, 2, 3, 5, 10, 20, 40, 80, 160, 320, 640, 1280, 2560, 5120, 10240, 20480, 40960, 81920};
 
 const int CompositeInterpolationXTable::get_y_stride(const int logK) {
-  assert(logK >= MIN_LOG_K && logK <= MAX_LOG_K);
-  return yStrides[logK - MIN_LOG_K];
+  assert(logK >= HllUtil::MIN_LOG_K && logK <= HllUtil::MAX_LOG_K);
+  return yStrides[logK - HllUtil::MIN_LOG_K];
 }
 
 const int CompositeInterpolationXTable::get_x_arr_length(const int logK) {
@@ -773,10 +773,9 @@ static const double xArr[18][numXArrValues] = {
 }
 };
 
-
 const double* const CompositeInterpolationXTable::get_x_arr(const int logK) {
-  assert(logK >= MIN_LOG_K && logK <= MAX_LOG_K);
-  return xArr[logK - MIN_LOG_K];
+  assert(logK >= HllUtil::MIN_LOG_K && logK <= HllUtil::MAX_LOG_K);
+  return xArr[logK - HllUtil::MIN_LOG_K];
 }
 
 /*

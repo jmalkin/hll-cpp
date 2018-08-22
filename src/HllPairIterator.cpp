@@ -9,7 +9,7 @@
 #include "HllUtil.hpp"
 #include "HllPairIterator.hpp"
 
-namespace sketches {
+namespace datasketches {
 
 HllPairIterator::HllPairIterator(const int lengthPairs)
   : lengthPairs(lengthPairs),
@@ -36,7 +36,7 @@ int HllPairIterator::getSlot() {
 }
 
 int HllPairIterator::getPair() {
-  return pair(index, val);
+  return HllUtil::pair(index, val);
 }
 
 int HllPairIterator::getValue() {
@@ -60,7 +60,7 @@ bool HllPairIterator::nextAll() {
 bool HllPairIterator::nextValid() {
   while (++index < lengthPairs) {
     val = value();
-    if (val != EMPTY) {
+    if (val != HllUtil::EMPTY) {
       return true;
     }
   }

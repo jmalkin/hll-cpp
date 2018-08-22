@@ -10,7 +10,7 @@
 #include <sstream>
 #include <memory>
 
-namespace sketches {
+namespace datasketches {
 
 AuxHashMap::AuxHashMap(int lgAuxArrInts,int lgConfigK)
   : lgConfigK(lgConfigK),
@@ -62,7 +62,7 @@ std::unique_ptr<PairIterator> AuxHashMap::getIterator() {
 
 void AuxHashMap::mustAdd(const int slotNo, const int value) {
   const int index = find(auxIntArr, lgAuxArrInts, lgConfigK, slotNo);
-  const int entry_pair = pair(slotNo, value);
+  const int entry_pair = HllUtil::pair(slotNo, value);
   if (index >= 0) {
     std::ostringstream oss;
     oss << "Found a slotNo that should not be there: "
@@ -80,7 +80,7 @@ void AuxHashMap::mustAdd(const int slotNo, const int value) {
 int AuxHashMap::mustFindValueFor(const int slotNo) {
   const int index = find(auxIntArr, lgAuxArrInts, lgConfigK, slotNo);
   if (index >= 0) {
-    return getValue(auxIntArr[index]);
+    return HllUtil::getValue(auxIntArr[index]);
   }
 
   std::ostringstream oss;
@@ -91,7 +91,7 @@ int AuxHashMap::mustFindValueFor(const int slotNo) {
 void AuxHashMap::mustReplace(const int slotNo, const int value) {
   const int idx = find(auxIntArr, lgAuxArrInts, lgConfigK, slotNo);
   if (idx >= 0) {
-    auxIntArr[idx] = pair(slotNo, value);
+    auxIntArr[idx] = HllUtil::pair(slotNo, value);
     return;
   }
   std::ostringstream oss;
@@ -102,7 +102,7 @@ void AuxHashMap::mustReplace(const int slotNo, const int value) {
 }
 
 void AuxHashMap::checkGrow() {
-  if ((RESIZE_DENOM * auxCount) > (RESIZE_NUMER * (1 << lgAuxArrInts))) {
+  if ((HllUtil::RESIZE_DENOM * auxCount) > (HllUtil::RESIZE_NUMER * (1 << lgAuxArrInts))) {
     growAuxSpace();
   }
 }
@@ -116,7 +116,7 @@ void AuxHashMap::growAuxSpace() {
   std::fill(auxIntArr, auxIntArr + newArrLen, 0);
   for (int i = 0; i < oldArrLen; ++i) {
     const int fetched = oldArray[i];
-    if (fetched != EMPTY) {
+    if (fetched != HllUtil::EMPTY) {
       // find empty in new array
       const int idx = find(auxIntArr, lgAuxArrInts, lgConfigK, fetched * configKmask);
       auxIntArr[~idx] = fetched;
@@ -140,7 +140,7 @@ int AuxHashMap::find(const int* auxArr, const int lgAuxArrInts, const int lgConf
   const  int loopIndex = probe;
   do {
     const int arrVal = auxArr[probe];
-    if (arrVal == EMPTY) { //Compares on entire entry
+    if (arrVal == HllUtil::EMPTY) { //Compares on entire entry
       return ~probe; //empty
     }
     else if (slotNo == (arrVal & configKmask)) { //Compares only on slotNo

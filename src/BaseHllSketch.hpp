@@ -7,7 +7,7 @@
 
 #include "HllUtil.hpp"
 
-namespace sketches {
+namespace datasketches {
 
 enum TgtHllType {
     HLL_4 = 0,

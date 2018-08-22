@@ -7,7 +7,7 @@
 
 #include "HarmonicNumbers.hpp"
 
-namespace sketches {
+namespace datasketches {
 
 double HarmonicNumbers::getBitMapEstimate(const int bitVectorLength, const int numBitsSet) {
   return (bitVectorLength * (harmonicNumber(bitVectorLength) - harmonicNumber(bitVectorLength - numBitsSet)));

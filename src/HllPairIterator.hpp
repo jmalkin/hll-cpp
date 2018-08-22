@@ -8,7 +8,7 @@
 #include "PairIterator.hpp"
 #include "HllArray.hpp"
 
-namespace sketches {
+namespace datasketches {
   
 class HllPairIterator : public PairIterator {
   public:

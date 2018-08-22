@@ -7,7 +7,7 @@
 
 #include "Hll8Array.hpp"
 
-namespace sketches {
+namespace datasketches {
 
 Hll8Iterator::Hll8Iterator(Hll8Array& hllArray, const int lengthPairs)
   : HllPairIterator(lengthPairs),
@@ -17,11 +17,11 @@ Hll8Iterator::Hll8Iterator(Hll8Array& hllArray, const int lengthPairs)
 Hll8Iterator::~Hll8Iterator() { }
 
 int Hll8Iterator::value() {
-  return hllArray.hllByteArr[index] & VAL_MASK_6;
+  return hllArray.hllByteArr[index] & HllUtil::VAL_MASK_6;
 }
 
 Hll8Array::Hll8Array(const int lgConfigK) :
-    HllArray(lgConfigK, HLL_8) {
+    HllArray(lgConfigK, TgtHllType::HLL_8) {
   const int numBytes = hll8ArrBytes(lgConfigK);
   hllByteArr = new uint8_t[numBytes];
   std::fill(hllByteArr, hllByteArr + numBytes, 0);
@@ -47,11 +47,11 @@ std::unique_ptr<PairIterator> Hll8Array::getIterator() {
 }
 
 int Hll8Array::getSlot(const int slotNo) {
-  return (int) hllByteArr[slotNo] & VAL_MASK_6;
+  return (int) hllByteArr[slotNo] & HllUtil::VAL_MASK_6;
 }
 
 void Hll8Array::putSlot(const int slotNo, const int value) {
-  hllByteArr[slotNo] = value & VAL_MASK_6;
+  hllByteArr[slotNo] = value & HllUtil::VAL_MASK_6;
 }
 
 int Hll8Array::getHllByteArrBytes() {

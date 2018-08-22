@@ -9,7 +9,7 @@
 
 #include <memory>
 
-namespace sketches {
+namespace datasketches {
 
 class HllSketch;
 

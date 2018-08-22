@@ -5,7 +5,7 @@
 
 #include "RelativeErrorTables.hpp"
 
-namespace sketches {
+namespace datasketches {
 
 //case 0
 static double HIP_LB[] = //sd 1, 2, 3

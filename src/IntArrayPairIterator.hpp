@@ -7,7 +7,7 @@
 
 #include "PairIterator.hpp"
 
-namespace sketches {
+namespace datasketches {
 
 class IntArrayPairIterator : public PairIterator {
   public:

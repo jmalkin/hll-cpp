@@ -9,7 +9,7 @@
 #include "HllUtil.hpp"
 #include "IntArrayPairIterator.hpp"
 
-namespace sketches {
+namespace datasketches {
 
 IntArrayPairIterator::IntArrayPairIterator(const int* array, const int len, const int lgConfigK)
   : array(array),
@@ -49,7 +49,7 @@ int IntArrayPairIterator::getIndex() {
 }
 
 int IntArrayPairIterator::getKey() {
-  return sketches::getLow26(pair);
+  return HllUtil::getLow26(pair);
 }
 
 int IntArrayPairIterator::getPair() {
@@ -61,7 +61,7 @@ int IntArrayPairIterator::getSlot() {
 }
 
 int IntArrayPairIterator::getValue() {
-  return sketches::getValue(pair);
+  return HllUtil::getValue(pair);
 }
 
 bool IntArrayPairIterator::nextAll() {
@@ -75,7 +75,7 @@ bool IntArrayPairIterator::nextAll() {
 bool IntArrayPairIterator::nextValid() {
   while (++index < lengthPairs) {
     const int p = array[index];
-    if (p != sketches::EMPTY) {
+    if (p != HllUtil::EMPTY) {
       pair = p;
       return true;
     }
@@ -84,4 +84,3 @@ bool IntArrayPairIterator::nextValid() {
 }
 
 }
-

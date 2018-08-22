@@ -6,7 +6,7 @@
 #include "BaseHllSketch.hpp"
 #include "HllSketch.hpp"
 
-namespace sketches {
+namespace datasketches {
 
 /**
  * This performs union operations for HLL sketches. This union operator is configured with a
@@ -32,12 +32,12 @@ namespace sketches {
  * @author Lee Rhodes
  * @author Kevin Lang
  */
-class Union : public BaseHllSketch {
+class HllUnion : public BaseHllSketch {
   public:
-    explicit Union(const int lgMaxK);
-    explicit Union(HllSketch& sketch);
+    explicit HllUnion(const int lgMaxK);
+    explicit HllUnion(HllSketch& sketch);
 
-    virtual ~Union();
+    virtual ~HllUnion();
 
     double getEstimate();
     double getCompositeEstimate();

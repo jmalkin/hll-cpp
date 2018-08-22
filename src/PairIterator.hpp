@@ -7,7 +7,7 @@
 
 #include <string>
 
-namespace sketches {
+namespace datasketches {
 
 class PairIterator {
   public:

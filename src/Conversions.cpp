@@ -8,7 +8,7 @@
 
 #include <memory>
 
-namespace sketches {
+namespace datasketches {
 
 Hll4Array* Conversions::convertToHll4(HllArray& srcHllArr) {
   const int lgConfigK = srcHllArr.getLgConfigK();
@@ -17,8 +17,8 @@ Hll4Array* Conversions::convertToHll4(HllArray& srcHllArr) {
 
   // 1st pass: compute starting curMin and numAtCurMin
   int pairVals = curMinAndNum(srcHllArr);
-  int curMin = getValue(pairVals);
-  int numAtCurMin = getLow26(pairVals);
+  int curMin = HllUtil::getValue(pairVals);
+  int numAtCurMin = HllUtil::getLow26(pairVals);
 
   // 2nd pass: must know curMin.
   // Populate KxQ registers, build AuxHashMap if needed
@@ -31,9 +31,9 @@ Hll4Array* Conversions::convertToHll4(HllArray& srcHllArr) {
     const int actualValue = itr->getValue();
     HllArray::hipAndKxQIncrementalUpdate(*hll4Array, 0, actualValue);
     if (actualValue >= (curMin + 15)) {
-      hll4Array->putSlot(slotNo, AUX_TOKEN);
+      hll4Array->putSlot(slotNo, HllUtil::AUX_TOKEN);
       if (auxHashMap == nullptr) {
-        auxHashMap = new AuxHashMap(LG_AUX_ARR_INTS[lgConfigK], lgConfigK);
+        auxHashMap = new AuxHashMap(HllUtil::LG_AUX_ARR_INTS[lgConfigK], lgConfigK);
         hll4Array->putAuxHashMap(auxHashMap);
       }
       auxHashMap->mustAdd(slotNo, actualValue);
@@ -63,7 +63,7 @@ int Conversions::curMinAndNum(HllArray& hllArr) {
     }
   }
 
-  return pair(numAtCurMin, curMin);
+  return HllUtil::pair(numAtCurMin, curMin);
 }
 
 Hll8Array* Conversions::convertToHll8(HllArray& srcHllArr) {
@@ -74,7 +74,7 @@ Hll8Array* Conversions::convertToHll8(HllArray& srcHllArr) {
   int numZeros = 1 << lgConfigK;
   std::unique_ptr<PairIterator> itr = srcHllArr.getIterator();
   while (itr->nextAll()) {
-    if (itr->getValue() != EMPTY) {
+    if (itr->getValue() != HllUtil::EMPTY) {
       --numZeros;
       hll8Array->couponUpdate(itr->getPair());
     }

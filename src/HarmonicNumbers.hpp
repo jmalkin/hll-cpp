@@ -7,7 +7,7 @@
 
 #include <cstdint>
 
-namespace sketches {
+namespace datasketches {
 
 class HarmonicNumbers {
   public:

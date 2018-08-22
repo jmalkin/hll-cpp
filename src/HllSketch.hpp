@@ -12,7 +12,7 @@
 #include <memory>
 #include <iostream>
 
-namespace sketches {
+namespace datasketches {
 
 class HllSketchImpl;
 
@@ -73,7 +73,7 @@ class HllSketch : public BaseHllSketch {
     std::string type_as_string();
     std::string mode_as_string();
 
-    friend class Union;
+    friend class HllUnion;
 };
 
 std::ostream& operator<<(std::ostream& os, HllSketch& sketch);

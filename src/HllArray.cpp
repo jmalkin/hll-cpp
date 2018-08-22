@@ -16,7 +16,7 @@
 #include <cstring>
 #include <cmath>
 
-namespace sketches {
+namespace datasketches {
 
 HllArray::HllArray(const int lgConfigK, const TgtHllType tgtHllType)
   : HllSketchImpl(lgConfigK, tgtHllType, CurMode::HLL) {
@@ -52,7 +52,7 @@ HllArray* HllArray::copyAs(const TgtHllType tgtHllType) {
   if (tgtHllType == getTgtHllType()) {
     return (HllArray*) copy();
   }
-  if (tgtHllType == HLL_4) {
+  if (tgtHllType == TgtHllType::HLL_4) {
     return Conversions::convertToHll4(*this);
   } else { // tgtHllType == HLL_8
     return Conversions::convertToHll8(*this);
@@ -72,8 +72,8 @@ HllArray* HllArray::newHll(const int lgConfigK, const TgtHllType tgtHllType) {
 
 HllSketchImpl* HllArray::couponUpdate(const int coupon) { // used by HLL_8 (and 6 if ever added)
   const int configKmask = (1 << getLgConfigK()) - 1;
-  const int slotNo = getLow26(coupon) & configKmask;
-  const int newVal = getValue(coupon);
+  const int slotNo = HllUtil::getLow26(coupon) & configKmask;
+  const int newVal = HllUtil::getValue(coupon);
   assert(newVal > 0);
 
   const int curVal = getSlot(slotNo);
@@ -115,7 +115,7 @@ double HllArray::getEstimate() {
  * the very small values <= k where curMin = 0 still apply.
  */
 double HllArray::getLowerBound(const int numStdDev) {
-  checkNumStdDev(numStdDev);
+  HllUtil::checkNumStdDev(numStdDev);
   const int configK = 1 << lgConfigK;
   const double numNonZeros = ((curMin == 0) ? (configK - numAtCurMin) : configK);
 
@@ -123,10 +123,10 @@ double HllArray::getLowerBound(const int numStdDev) {
   double rseFactor;
   if (oooFlag) {
     estimate = getCompositeEstimate();
-    rseFactor = HLL_NON_HIP_RSE_FACTOR;
+    rseFactor = HllUtil::HLL_NON_HIP_RSE_FACTOR;
   } else {
     estimate = hipAccum;
-    rseFactor = HLL_HIP_RSE_FACTOR;
+    rseFactor = HllUtil::HLL_HIP_RSE_FACTOR;
   }
 
   double relErr;
@@ -139,17 +139,17 @@ double HllArray::getLowerBound(const int numStdDev) {
 }
 
 double HllArray::getUpperBound(const int numStdDev) {
-  checkNumStdDev(numStdDev);
+  HllUtil::checkNumStdDev(numStdDev);
   const int configK = 1 << lgConfigK;
 
   double estimate;
   double rseFactor;
   if (oooFlag) {
     estimate = getCompositeEstimate();
-    rseFactor = HLL_NON_HIP_RSE_FACTOR;
+    rseFactor = HllUtil::HLL_NON_HIP_RSE_FACTOR;
   } else {
     estimate = hipAccum;
-    rseFactor = HLL_HIP_RSE_FACTOR;
+    rseFactor = HllUtil::HLL_HIP_RSE_FACTOR;
   }
 
   // TODO: add RelativeErrorTables to handle -1 case
@@ -215,7 +215,6 @@ double HllArray::getCompositeEstimate() {
 
   return (avgEst > (crossOver * (1 << lgConfigK))) ? adjEst : linEst;
 }
-
 
 double HllArray::getKxQ0() {
   return kxq0;
@@ -295,11 +294,11 @@ int HllArray::hll8ArrBytes(const int lgConfigK) {
 }
 
 int HllArray::getMemDataStart() {
-  return HLL_BYTE_ARR_START;
+  return HllUtil::HLL_BYTE_ARR_START;
 }
 
 int HllArray::getUpdatableSerializationBytes() {
-  return HLL_BYTE_ARR_START + getHllByteArrBytes();
+  return HllUtil::HLL_BYTE_ARR_START + getHllByteArrBytes();
 }
 
 int HllArray::getCompactSerializationBytes() {
@@ -308,7 +307,7 @@ int HllArray::getCompactSerializationBytes() {
 }
 
 int HllArray::getPreInts() {
-  return HLL_PREINTS;
+  return HllUtil::HLL_PREINTS;
 }
 
 std::unique_ptr<PairIterator> HllArray::getAuxIterator() {
@@ -328,10 +327,10 @@ void HllArray::hipAndKxQIncrementalUpdate(HllArray& host, const int oldValue, co
   double kxq1 = host.getKxQ1();
   host.addToHipAccum(configK / (kxq0 + kxq1));
   // update kxq0 and kxq1; subtract first, then add
-  if (oldValue < 32) { host.putKxQ0(kxq0 -= invPow2(oldValue)); }
-  else               { host.putKxQ1(kxq1 -= invPow2(oldValue)); }
-  if (newValue < 32) { host.putKxQ0(kxq0 += invPow2(newValue)); }
-  else               { host.putKxQ1(kxq1 += invPow2(newValue)); }
+  if (oldValue < 32) { host.putKxQ0(kxq0 -= HllUtil::invPow2(oldValue)); }
+  else               { host.putKxQ1(kxq1 -= HllUtil::invPow2(oldValue)); }
+  if (newValue < 32) { host.putKxQ0(kxq0 += HllUtil::invPow2(newValue)); }
+  else               { host.putKxQ1(kxq1 += HllUtil::invPow2(newValue)); }
 }
 
 /**

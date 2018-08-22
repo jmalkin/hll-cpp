@@ -8,7 +8,7 @@
 #include "HllSketchImpl.hpp"
 #include "AuxHashMap.hpp"
 
-namespace sketches {
+namespace datasketches {
 
 class HllArray : public HllSketchImpl {
   public:

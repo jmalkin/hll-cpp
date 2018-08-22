@@ -9,7 +9,7 @@
 #include "AuxHashMap.hpp"
 #include "HllArray.hpp"
 
-namespace sketches {
+namespace datasketches {
 
 class Hll4Array : public HllArray {
   public:

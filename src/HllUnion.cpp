@@ -3,52 +3,52 @@
  * Apache License 2.0. See LICENSE file at the project root for terms.
  */
 
-#include "Union.hpp"
+#include "HllUnion.hpp"
 
 #include "HllSketchImpl.hpp"
 #include "HllArray.hpp"
 #include "HllUtil.hpp"
 
-namespace sketches {
+namespace datasketches {
 
-Union::Union(const int lgMaxK)
-  : lgMaxK(checkLgK(lgMaxK)) {
+HllUnion::HllUnion(const int lgMaxK)
+  : lgMaxK(HllUtil::checkLgK(lgMaxK)) {
   gadget = new HllSketch(lgMaxK, TgtHllType::HLL_8);
 }
 
-Union::Union(HllSketch& sketch)
+HllUnion::HllUnion(HllSketch& sketch)
   : lgMaxK(sketch.getLgConfigK()) {
   TgtHllType tgtHllType = sketch.getTgtHllType();
   if (tgtHllType != TgtHllType::HLL_8) {
-    throw std::invalid_argument("Union can only wrap HLL_8 sketches");
+    throw std::invalid_argument("HllUnion can only wrap HLL_8 sketches");
   }
   gadget = &sketch;
 }
 
-Union::~Union() {
+HllUnion::~HllUnion() {
   if (gadget != nullptr) {
     delete gadget;
   }
 }
 
-HllSketch* Union::getResult() {
+HllSketch* HllUnion::getResult() {
   return gadget->copyAs(TgtHllType::HLL_4);
 }
 
-HllSketch* Union::getResult(TgtHllType tgtHllType) {
+HllSketch* HllUnion::getResult(TgtHllType tgtHllType) {
   return gadget->copyAs(tgtHllType);
 }
 
-void Union::update(HllSketch* sketch) {
+void HllUnion::update(HllSketch* sketch) {
   unionImpl(sketch->hllSketchImpl, lgMaxK);
 }
 
-void Union::update(HllSketch& sketch) {
+void HllUnion::update(HllSketch& sketch) {
   unionImpl(sketch.hllSketchImpl, lgMaxK);
 }
 
-void Union::couponUpdate(const int coupon) {
-  if (coupon == EMPTY) { return; }
+void HllUnion::couponUpdate(const int coupon) {
+  if (coupon == HllUtil::EMPTY) { return; }
   HllSketchImpl* result = gadget->hllSketchImpl->couponUpdate(coupon);
   if (result != gadget->hllSketchImpl) {
     if (gadget->hllSketchImpl != nullptr) { delete gadget->hllSketchImpl; }
@@ -56,68 +56,68 @@ void Union::couponUpdate(const int coupon) {
   }
 }
 
-std::ostream& Union::to_string(std::ostream& os, const bool summary,
+std::ostream& HllUnion::to_string(std::ostream& os, const bool summary,
                                const bool detail, const bool auxDetail, const bool all) {
   return gadget->to_string(os, summary, detail, auxDetail, all);
 }
 
-double Union::getEstimate() {
+double HllUnion::getEstimate() {
   return gadget->getEstimate();
 }
 
-double Union::getCompositeEstimate() {
+double HllUnion::getCompositeEstimate() {
   return gadget->getCompositeEstimate();
 }
 
-double Union::getLowerBound(const int numStdDev) {
+double HllUnion::getLowerBound(const int numStdDev) {
   return gadget->getLowerBound(numStdDev);
 }
 
-double Union::getUpperBound(const int numStdDev) {
+double HllUnion::getUpperBound(const int numStdDev) {
   return gadget->getUpperBound(numStdDev);
 }
 
-int Union::getCompactSerializationBytes() {
+int HllUnion::getCompactSerializationBytes() {
   return gadget->getCompactSerializationBytes();
 }
 
-int Union::getUpdatableSerializationBytes() {
+int HllUnion::getUpdatableSerializationBytes() {
   return gadget->getUpdatableSerializationBytes();
 }
 
-int Union::getLgConfigK() {
+int HllUnion::getLgConfigK() {
   return gadget->getLgConfigK();
 }
 
-void Union::reset() {
+void HllUnion::reset() {
   gadget->reset();
 }
 
-bool Union::isCompact() {
+bool HllUnion::isCompact() {
   return gadget->isCompact();
 }
 
-bool Union::isEmpty() {
+bool HllUnion::isEmpty() {
   return gadget->isEmpty();
 }
 
-bool Union::isOutOfOrderFlag() {
+bool HllUnion::isOutOfOrderFlag() {
   return gadget->isOutOfOrderFlag();
 }
 
-CurMode Union::getCurMode() {
+CurMode HllUnion::getCurMode() {
   return gadget->getCurMode();
 }
 
-TgtHllType Union::getTgtHllType() {
+TgtHllType HllUnion::getTgtHllType() {
   return TgtHllType::HLL_8;
 }
 
-int Union::getMaxSerializationBytes(const int lgK) {
+int HllUnion::getMaxSerializationBytes(const int lgK) {
   return HllSketch::getMaxUpdatableSerializationBytes(lgK, TgtHllType::HLL_8);
 }
 
-HllSketchImpl* Union::copyOrDownsampleHll(HllSketchImpl* srcImpl, const int tgtLgK) {
+HllSketchImpl* HllUnion::copyOrDownsampleHll(HllSketchImpl* srcImpl, const int tgtLgK) {
   assert(srcImpl->getCurMode() == CurMode::HLL);
   HllArray* src = (HllArray*) srcImpl;
   const int srcLgK = src->getLgConfigK();
@@ -137,7 +137,7 @@ HllSketchImpl* Union::copyOrDownsampleHll(HllSketchImpl* srcImpl, const int tgtL
   return tgtHllArr;
 }
 
-inline HllSketchImpl* Union::leakFreeCouponUpdate(HllSketchImpl* impl, const int coupon) {
+inline HllSketchImpl* HllUnion::leakFreeCouponUpdate(HllSketchImpl* impl, const int coupon) {
   HllSketchImpl* result = impl->couponUpdate(coupon);
   if (result != impl) {
     delete impl;
@@ -145,7 +145,7 @@ inline HllSketchImpl* Union::leakFreeCouponUpdate(HllSketchImpl* impl, const int
   return result;
 }
 
-void Union::unionImpl(HllSketchImpl* incomingImpl, const int lgMaxK) {
+void HllUnion::unionImpl(HllSketchImpl* incomingImpl, const int lgMaxK) {
   assert(gadget->hllSketchImpl->getTgtHllType() == TgtHllType::HLL_8);
   HllSketchImpl* srcImpl = incomingImpl; //default
   HllSketchImpl* dstImpl = gadget->hllSketchImpl; //default
@@ -298,6 +298,5 @@ void Union::unionImpl(HllSketchImpl* incomingImpl, const int lgMaxK) {
   
   gadget->hllSketchImpl = dstImpl;
 }
-
 
 }

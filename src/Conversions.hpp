@@ -9,7 +9,7 @@
 #include "Hll4Array.hpp"
 #include "Hll8Array.hpp"
 
-namespace sketches {
+namespace datasketches {
 
 class Conversions {
 public:

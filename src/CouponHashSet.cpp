@@ -7,7 +7,7 @@
 
 #include <cassert>
 
-namespace sketches {
+namespace datasketches {
 
 static int find(const int* array, const int lgArrInts, const int coupon);
 
@@ -47,15 +47,15 @@ HllSketchImpl* CouponHashSet::couponUpdate(int coupon) {
 }
 
 int CouponHashSet::getMemDataStart() {
-  return HASH_SET_INT_ARR_START;
+  return HllUtil::HASH_SET_INT_ARR_START;
 }
 
 int CouponHashSet::getPreInts() {
-  return HASH_SET_PREINTS;
+  return HllUtil::HASH_SET_PREINTS;
 }
 
 bool CouponHashSet::checkGrowOrPromote() {
-  if ((RESIZE_DENOM * couponCount) > (RESIZE_NUMER * (1 << lgCouponArrInts))) {
+  if ((HllUtil::RESIZE_DENOM * couponCount) > (HllUtil::RESIZE_NUMER * (1 << lgCouponArrInts))) {
     if (lgCouponArrInts == (lgConfigK - 3)) { // at max size
       return true; // promote to HLL
     }
@@ -71,7 +71,7 @@ void CouponHashSet::growHashSet(const int tgtLgCoupArrSize) {
 
   for (int i = 0; i < tgtLen; ++i) { // scan existing array for non-zero values
     const int fetched = couponIntArr[i];
-    if (fetched != EMPTY) {
+    if (fetched != HllUtil::EMPTY) {
       const int idx = find(tgtCouponIntArr, tgtLen, fetched); // search TGT array
       if (idx < 0) { // found EMPTY
         tgtCouponIntArr[~idx] = fetched; // insert
@@ -92,13 +92,13 @@ static int find(const int* array, const int lgArrInts, const int coupon) {
   const int loopIndex = probe;
   do {
     const int couponAtIdx = array[probe];
-    if (couponAtIdx == EMPTY) {
+    if (couponAtIdx == HllUtil::EMPTY) {
       return ~probe; //empty
     }
     else if (coupon == couponAtIdx) {
       return probe; //duplicate
     }
-    const int stride = ((coupon & KEY_MASK_26) >> lgArrInts) | 1;
+    const int stride = ((coupon & HllUtil::KEY_MASK_26) >> lgArrInts) | 1;
     probe = (probe + stride) & arrMask;
   } while (probe != loopIndex);
   throw std::invalid_argument("Key not found and no empty slots!");

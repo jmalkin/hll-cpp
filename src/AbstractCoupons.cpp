@@ -9,7 +9,7 @@
 #include "CubicInterpolation.hpp"
 #include "AbstractCoupons.hpp"
 
-namespace sketches {
+namespace datasketches {
 
 AbstractCoupons::AbstractCoupons(const int lgConfigK, const TgtHllType tgtHllType, const CurMode curMode)
   : HllSketchImpl(lgConfigK, tgtHllType, curMode) {}
@@ -25,18 +25,18 @@ double AbstractCoupons::getEstimate() {
 }
 
 double AbstractCoupons::getLowerBound(const int numStdDev) {
-  sketches::checkNumStdDev(numStdDev);
+  HllUtil::checkNumStdDev(numStdDev);
   const int couponCount = getCouponCount();
   const double est = CubicInterpolation::usingXAndYTables(couponCount);
-  const double tmp = est / (1.0 + (numStdDev * COUPON_RSE));
+  const double tmp = est / (1.0 + (numStdDev * HllUtil::COUPON_RSE));
   return fmax(tmp, couponCount);
 }
 
 double AbstractCoupons::getUpperBound(const int numStdDev) {
-  sketches::checkNumStdDev(numStdDev);
+  HllUtil::checkNumStdDev(numStdDev);
   const int couponCount = getCouponCount();
   const double est = CubicInterpolation::usingXAndYTables(couponCount);
-  const double tmp = est / (1.0 - (numStdDev * COUPON_RSE));
+  const double tmp = est / (1.0 - (numStdDev * HllUtil::COUPON_RSE));
   return fmax(tmp, couponCount);
 }
 

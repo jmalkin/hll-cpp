@@ -7,7 +7,7 @@
 
 #include "CouponList.hpp"
 
-namespace sketches {
+namespace datasketches {
 
 class CouponHashSet : public CouponList {
   protected:

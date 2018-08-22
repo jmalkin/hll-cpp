@@ -5,7 +5,7 @@
 
 #pragma once
 
-namespace sketches {
+namespace datasketches {
 
 class CubicInterpolation {
   public:

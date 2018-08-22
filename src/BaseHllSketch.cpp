@@ -10,7 +10,7 @@
 #include <cmath>
 #include <cassert>
 
-namespace sketches {
+namespace datasketches {
 
 int BaseHllSketch::getSerializationVersion() {
   // TODO: write me -- define value somewhere

@@ -5,7 +5,7 @@
 
 #include "HllSketchImpl.hpp"
 
-namespace sketches {
+namespace datasketches {
 
 static int numImpls = 0;
 
@@ -31,6 +31,5 @@ int HllSketchImpl::getLgConfigK() {
 CurMode HllSketchImpl::getCurMode() {
   return curMode;
 }
-
 
 }
