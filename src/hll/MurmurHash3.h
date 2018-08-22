@@ -4,6 +4,10 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //-----------------------------------------------------------------------------
 // Platform-specific functions and macros
 
@@ -28,3 +32,7 @@ typedef unsigned __int64 uint64_t;
 void MurmurHash3_x64_128 ( const void * key, int len, uint64_t seed, void * out );
 
 //-----------------------------------------------------------------------------
+
+#ifdef __cplusplus
+}
+#endif
